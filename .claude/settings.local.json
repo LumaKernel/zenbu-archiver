@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(deno fmt:*)",
+      "Bash(deno lint:*)",
+      "Bash(deno check:*)",
+      "Bash(chmod:*)",
+      "Bash(touch:*)",
+      "Bash(bun install:*)",
+      "Bash(bun run:*)",
+      "Bash(./bin/cli.ts playwright-install)",
+      "Bash(./bin/cli.ts --help)",
+      "Bash(./bin/cli.ts list:*)",
+      "Bash(ZENBU_ARCHIVE_ORIGIN=https://example.com ./bin/cli.ts list)",
+      "Bash(bun run:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": []
+  }
+}

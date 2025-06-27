@@ -1,0 +1,28 @@
+{
+  "name": "zenbu-archiver",
+  "version": "0.0.0-dev",
+  "main": "bin/cli.js",
+  "bin": {
+    "zenbu-archiver": "./bin/cli.js"
+  },
+  "scripts": {
+    "lint": "prettier --list-different .",
+    "lint-fix": "prettier --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3.5.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "effect": "^3.16.5",
+    "playwright": "^1.52.0"
+  },
+  "author": "Luma <world@luma.email>",
+  "license": "MIT"
+}
