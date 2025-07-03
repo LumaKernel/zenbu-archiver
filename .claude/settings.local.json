@@ -15,7 +15,9 @@
       "Bash(ZENBU_ARCHIVE_ORIGIN=https://example.com ./bin/cli.ts list)",
       "Bash(bun run:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(gemini:*)",
+      "WebFetch(domain:effect-ts.github.io)"
     ],
     "deny": []
   }
