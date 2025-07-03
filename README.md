@@ -13,7 +13,7 @@ zenbu-archiverは、ある種の構造を持ったサービスから、すべて
 ## インストール
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/LumaKernel/zenbu-archiver
 cd zenbu-archiver
 bun install
 ./bin/cli.ts --help
