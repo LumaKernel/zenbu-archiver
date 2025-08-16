@@ -1,4 +1,4 @@
-import { Console, Effect, Option, Layer } from "effect";
+import { Console, Effect, Option, Layer, Schedule } from "effect";
 import { getCourses } from "../util/course.js";
 import { getChapters } from "../util/chapter.js";
 import { getVideos } from "../util/videos.js";
@@ -157,7 +157,14 @@ export const archiveCommand = (
                   await page.pdf({
                     path: pdfPath,
                   });
-                }),
+                }).pipe(
+                  Effect.retry(
+                    Schedule.union(
+                      Schedule.exponential(100),
+                      Schedule.recurs(3),
+                    ),
+                  ),
+                ),
               )
               .pipe(Effect.scoped),
           ),

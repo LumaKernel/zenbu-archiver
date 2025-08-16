@@ -66,31 +66,31 @@ export ZENBU_ARCHIVE_ORIGIN=https://www.example.com
 すべての完了済み授業をアーカイブ：
 
 ```bash
-./bin/cli.ts archive --output archives/
+./bin/cli.ts archive --output-dir archives/
 ```
 
 特定の授業のみをアーカイブ：
 
 ```bash
-./bin/cli.ts archive --output archives/ --only "2024年前期:プログラミング入門"
+./bin/cli.ts archive --output-dir archives/ --only "2024年前期:プログラミング入門"
 ```
 
 特定の授業を除外してアーカイブ：
 
 ```bash
-./bin/cli.ts archive --output archives/ --exclude "2024年前期:統計学入門"
+./bin/cli.ts archive --output-dir archives/ --exclude "2024年前期:統計学入門"
 ```
 
 複数の授業を指定する場合はカンマ区切りで：
 
 ```bash
-./bin/cli.ts archive --output archives/ --only "2024年前期:プログラミング入門,2024年前期:データサイエンス基礎"
+./bin/cli.ts archive --output-dir archives/ --only "2024年前期:プログラミング入門,2024年前期:データサイエンス基礎"
 ```
 
 コマンドライン引数でオリジンを指定：
 
 ```bash
-./bin/cli.ts archive --output archives/ --origin https://www.example.com --origin-api https://api.example.com
+./bin/cli.ts archive --output-dir archives/ --origin https://www.example.com --origin-api https://api.example.com
 ```
 
 ## 出力形式
