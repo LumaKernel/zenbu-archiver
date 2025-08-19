@@ -39,7 +39,7 @@ const ExerciseOrReportSection = Schema.Struct({
   content_url: Schema.String,
   done: Schema.Boolean,
   total_question: Schema.Number,
-  blocked_until: Schema.NullOr(Schema.Any), // 型が不明なためAnyを使用
+  blocked_until: Schema.NullOr(Schema.Any),
 });
 
 // 全てのセクションタイプのユニオン
@@ -118,7 +118,6 @@ export const getVideos = (chapter: CourseChapter) =>
           ),
         );
         const courseData = decode(data);
-
         return courseData.chapter.sections
           .map((section) => {
             if (
@@ -127,7 +126,7 @@ export const getVideos = (chapter: CourseChapter) =>
             ) {
               return new ChapterVideo({
                 chapter,
-                videoId: String(section.id),
+                videoId: section.id.toString(),
                 numbering: section.id, // idを番号として使用
                 title: section.title,
               });
