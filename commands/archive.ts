@@ -2,6 +2,7 @@ import { Console, Effect, Option, Layer, Schedule } from "effect";
 import { getCourses } from "../util/course.js";
 import { getChapters } from "../util/chapter.js";
 import { getVideos } from "../util/videos.js";
+import { getExercises, type ChapterExercise } from "../util/exercises.js";
 import { BrowserSession, makeBrowserSessionLive } from "../util/auth.js";
 import { Origin } from "../util/origin.js";
 import * as fs from "node:fs/promises";
@@ -29,6 +30,8 @@ export const archiveCommand = (
   only: Option.Option<string>,
   exclude: Option.Option<string>,
   outputDir: string,
+  skipDocs: boolean = false,
+  skipExercises: boolean = false,
   debugHeaded: boolean = false,
   webOrigin: string,
   apiOrigin?: string,
@@ -112,6 +115,9 @@ export const archiveCommand = (
     // ブラウザセッションを取得
     const browser = yield* yield* BrowserSession;
 
+    // 全体のエクササイズデータを格納する配列
+    const allExercisesData: any[] = [];
+
     // 各コースをアーカイブ
     for (const course of courses) {
       const courseName = `${course.year}年${course.term}_${course.title}`;
@@ -134,45 +140,90 @@ export const archiveCommand = (
 
         yield* Console.log(`  チャプター: ${chapter.title}`);
 
-        // 動画情報を取得
-        const videos = yield* getVideos(chapter).pipe(
-          Effect.provide(originLive),
-          Effect.provide(makeBrowserSessionLive(!debugHeaded)),
-        );
+        // PDFの保存（skipDocsがfalseの場合のみ）
+        if (!skipDocs) {
+          // 動画情報を取得
+          const videos = yield* getVideos(chapter).pipe(
+            Effect.provide(originLive),
+            Effect.provide(makeBrowserSessionLive(!debugHeaded)),
+          );
 
-        // 各動画のリファレンスページをPDFとして保存（並列処理）
-        yield* Effect.all(
-          videos.map((video, i) =>
-            browser
-              .usePage((page) =>
-                Effect.tryPromise(async () => {
-                  await page.goto(video.referencesHref(webOrigin));
-                  // wait 30ms
-                  await new Promise((resolve) => setTimeout(resolve, 30));
-                  await page.waitForLoadState("networkidle");
-                  const pdfPath = path.join(
-                    chapterDir,
-                    `${(i * 2 + 1).toString().padStart(2, "0")}_${replaceSpecials(video.title)}.pdf`,
-                  );
-                  await page.pdf({
-                    path: pdfPath,
-                  });
-                }).pipe(
-                  Effect.retry(
-                    Schedule.union(
-                      Schedule.exponential(100),
-                      Schedule.recurs(3),
+          // 各動画のリファレンスページをPDFとして保存（並列処理）
+          yield* Effect.all(
+            videos.map((video, i) =>
+              browser
+                .usePage((page) =>
+                  Effect.tryPromise(async () => {
+                    await page.goto(video.referencesHref(webOrigin));
+                    // wait 30ms
+                    await new Promise((resolve) => setTimeout(resolve, 30));
+                    await page.waitForLoadState("networkidle");
+                    const pdfPath = path.join(
+                      chapterDir,
+                      `${(i * 2 + 1).toString().padStart(2, "0")}_${replaceSpecials(video.title)}.pdf`,
+                    );
+                    await page.pdf({
+                      path: pdfPath,
+                    });
+                  }).pipe(
+                    Effect.retry(
+                      Schedule.union(
+                        Schedule.exponential(100),
+                        Schedule.recurs(3),
+                      ),
                     ),
                   ),
-                ),
-              )
-              .pipe(Effect.scoped),
-          ),
-          { concurrency: "unbounded" },
-        );
+                )
+                .pipe(Effect.scoped),
+            ),
+            { concurrency: "unbounded" },
+          );
 
-        yield* Console.log(`    ${videos.length}個のPDFを保存しました`);
+          yield* Console.log(`    ${videos.length}個のPDFを保存しました`);
+        }
+
+        // エクササイズの取得と保存（skipExercisesがfalseの場合のみ）
+        if (!skipExercises) {
+          const exercises = yield* getExercises(chapter).pipe(
+            Effect.provide(originLive),
+            Effect.provide(makeBrowserSessionLive(!debugHeaded)),
+          );
+
+          if (exercises.length > 0) {
+            // エクササイズデータを配列に追加
+            for (const exercise of exercises) {
+              allExercisesData.push({
+                courseTitle: course.title,
+                courseYear: course.year,
+                courseTerm: course.term,
+                chapterTitle: chapter.title,
+                exerciseTitle: exercise.title,
+                exerciseId: exercise.exerciseId,
+                contentAvailable: exercise.contentAvailable,
+                exercise: exercise.exercise,
+              });
+            }
+            yield* Console.log(
+              `    ${exercises.length}個のエクササイズを取得しました`,
+            );
+          }
+        }
       }
+    }
+
+    // エクササイズデータをJSONファイルとして保存
+    if (!skipExercises && allExercisesData.length > 0) {
+      const exercisesJsonPath = path.join(outputDir, "exercises.json");
+      yield* Effect.tryPromise(() =>
+        fs.writeFile(
+          exercisesJsonPath,
+          JSON.stringify(allExercisesData, null, 2),
+          "utf-8",
+        ),
+      );
+      yield* Console.log(
+        `\n${allExercisesData.length}個のエクササイズをexercises.jsonに保存しました`,
+      );
     }
 
     yield* Console.log(`\nアーカイブが完了しました: ${outputDir}`);

@@ -20,6 +20,8 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@types/cheerio": "^1.0.0",
+    "cheerio": "^1.1.2",
     "effect": "^3.16.5",
     "playwright": "^1.52.0"
   },

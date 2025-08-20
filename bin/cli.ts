@@ -8,6 +8,7 @@ import { loginCommand } from "../commands/login.js";
 import { logoutCommand } from "../commands/logout.js";
 import { listCommand } from "../commands/list.js";
 import { archiveCommand } from "../commands/archive.js";
+import { convertToAnkiCommand } from "../commands/convert-to-anki.js";
 
 // グローバルオプション
 const originOption = Options.text("origin").pipe(
@@ -79,17 +80,38 @@ const outputDirOption = Options.directory("output-dir").pipe(
   Options.withDescription("出力ディレクトリ"),
 );
 
+const skipDocsOption = Options.boolean("skip-docs").pipe(
+  Options.withDefault(false),
+  Options.withDescription("ドキュメント（PDF）のアーカイブをスキップ"),
+);
+
+const skipExercisesOption = Options.boolean("skip-exercises").pipe(
+  Options.withDefault(false),
+  Options.withDescription("エクササイズのアーカイブをスキップ"),
+);
+
 const archive = Command.make(
   "archive",
   {
     only: onlyOption,
     exclude: excludeOption,
     outputDir: outputDirOption,
+    skipDocs: skipDocsOption,
+    skipExercises: skipExercisesOption,
     origin: originOption,
     originApi: originApiOption,
     debugHeaded: debugHeadedOption,
   },
-  ({ only, exclude, outputDir, origin, originApi, debugHeaded }) =>
+  ({
+    only,
+    exclude,
+    outputDir,
+    skipDocs,
+    skipExercises,
+    origin,
+    originApi,
+    debugHeaded,
+  }) =>
     Effect.gen(function* () {
       if (Option.isSome(only) && Option.isSome(exclude)) {
         yield* Console.error("エラー: --onlyと--excludeは同時に指定できません");
@@ -109,6 +131,8 @@ const archive = Command.make(
         only,
         exclude,
         outputDir,
+        skipDocs,
+        skipExercises,
         debugHeaded,
         originValue,
         Option.getOrUndefined(originApi),
@@ -116,9 +140,39 @@ const archive = Command.make(
     }),
 ).pipe(Command.withDescription("資料をアーカイブします"));
 
+// convert-to-anki コマンド
+const fileOption = Options.file("file").pipe(
+  Options.withDefault("./archives/exercises.json"),
+  Options.withDescription("入力となるエクササイズJSONファイル"),
+);
+
+const outputOption = Options.file("output").pipe(
+  Options.optional,
+  Options.withDescription(
+    "出力先のAnkiテキストファイル（デフォルト: 入力ファイルと同じディレクトリのanki.txt）",
+  ),
+);
+
+const convertToAnki = Command.make(
+  "convert-to-anki",
+  {
+    file: fileOption,
+    output: outputOption,
+  },
+  ({ file, output }) =>
+    convertToAnkiCommand(file, Option.getOrUndefined(output)),
+).pipe(Command.withDescription("エクササイズデータをAnki形式に変換"));
+
 // メインコマンド
 const mainCommand = Command.make("zenbu-archiver").pipe(
-  Command.withSubcommands([playwrightInstall, login, logout, list, archive]),
+  Command.withSubcommands([
+    playwrightInstall,
+    login,
+    logout,
+    list,
+    archive,
+    convertToAnki,
+  ]),
 );
 
 // CLI実行
