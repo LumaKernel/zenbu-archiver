@@ -5,6 +5,7 @@ import { getVideos } from "../util/videos.js";
 import { getExercises, type ChapterExercise } from "../util/exercises.js";
 import { BrowserSession, makeBrowserSessionLive } from "../util/auth.js";
 import { Origin } from "../util/origin.js";
+import { replaceSpecials } from "../util/common.js";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
@@ -12,24 +13,6 @@ const retrySchedule = Schedule.union(
   Schedule.exponential(100),
   Schedule.recurs(15),
 );
-
-const replaceSpecials = (str: string) =>
-  str
-    .replace(/\?/g, "？")
-    .replace(/</g, "＜")
-    .replace(/>/g, "＞")
-    .replace(/"/g, '"')
-    .replace(/'/g, "'")
-    .replace(/,/g, "，")
-    .replace(/!/g, "！")
-    .replace(/:/g, "：")
-    .replace(/;/g, "；")
-    .replace(/\\/g, "＼")
-    .replace(/\//g, "／")
-    .replace(/\|/g, "｜")
-    .replace(/[*]/g, "＊")
-    // deno-lint-ignore no-control-regex
-    .replace(/[\u0000-\u001F]/g, "");
 
 export const archiveCommand = (
   only: Option.Option<string>,

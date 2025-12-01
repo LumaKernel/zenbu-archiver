@@ -146,22 +146,17 @@ const fileOption = Options.file("file").pipe(
   Options.withDescription("入力となるエクササイズJSONファイル"),
 );
 
-const outputOption = Options.file("output").pipe(
-  Options.optional,
-  Options.withDescription(
-    "出力先のAnkiテキストファイル（デフォルト: 入力ファイルと同じディレクトリのanki.txt）",
-  ),
-);
-
 const convertToAnki = Command.make(
   "convert-to-anki",
   {
     file: fileOption,
-    output: outputOption,
   },
-  ({ file, output }) =>
-    convertToAnkiCommand(file, Option.getOrUndefined(output)),
-).pipe(Command.withDescription("エクササイズデータをAnki形式に変換"));
+  ({ file }) => convertToAnkiCommand(file),
+).pipe(
+  Command.withDescription(
+    "エクササイズデータを科目ごとにAnki形式に変換（各科目フォルダに{科目}-anki.txtを生成）",
+  ),
+);
 
 // メインコマンド
 const mainCommand = Command.make("zenbu-archiver").pipe(

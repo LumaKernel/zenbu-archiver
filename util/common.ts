@@ -6,3 +6,24 @@ export const makeBrowser = async (headless: boolean) => {
   });
   return browser;
 };
+
+/**
+ * ファイル名に使用できない特殊文字を全角に置換
+ */
+export const replaceSpecials = (str: string) =>
+  str
+    .replace(/\?/g, "？")
+    .replace(/</g, "＜")
+    .replace(/>/g, "＞")
+    .replace(/"/g, '"')
+    .replace(/'/g, "'")
+    .replace(/,/g, "，")
+    .replace(/!/g, "！")
+    .replace(/:/g, "：")
+    .replace(/;/g, "；")
+    .replace(/\\/g, "＼")
+    .replace(/\//g, "／")
+    .replace(/\|/g, "｜")
+    .replace(/[*]/g, "＊")
+    // deno-lint-ignore no-control-regex
+    .replace(/[\u0000-\u001F]/g, "");
