@@ -6,8 +6,6 @@ describe("convertToAnkiFormat", () => {
     const exercises = [
       {
         courseTitle: "サンプル講座",
-        courseYear: 2025,
-        courseTerm: "前期",
         chapterTitle: "第1章",
         exerciseTitle: "問題1",
         exerciseId: "001",
@@ -30,7 +28,7 @@ describe("convertToAnkiFormat", () => {
         "3. 選択肢C<br>" +
         "4. 選択肢D\t" +
         "2. 選択肢B\t" +
-        "サンプル講座 2025年前期 第1章",
+        "サンプル講座 第1章",
     );
   });
 
@@ -38,8 +36,6 @@ describe("convertToAnkiFormat", () => {
     const exercises = [
       {
         courseTitle: "数学",
-        courseYear: 2025,
-        courseTerm: "前期",
         chapterTitle: "微分",
         exerciseTitle: "問題1",
         exerciseId: "001",
@@ -53,8 +49,6 @@ describe("convertToAnkiFormat", () => {
       },
       {
         courseTitle: "物理",
-        courseYear: 2025,
-        courseTerm: "後期",
         chapterTitle: "力学",
         exerciseTitle: "問題2",
         exerciseId: "002",
@@ -79,18 +73,16 @@ describe("convertToAnkiFormat", () => {
     expect(lines).toHaveLength(2);
     expect(lines[0]).toContain("f(x)=x^2の導関数は？");
     expect(lines[0]).toContain("2. 2x");
-    expect(lines[0]).toContain("数学 2025年前期 微分");
+    expect(lines[0]).toContain("数学 微分");
     expect(lines[1]).toContain("F=maの意味は？");
     expect(lines[1]).toContain("1. 力=質量×加速度");
-    expect(lines[1]).toContain("物理 2025年後期 力学");
+    expect(lines[1]).toContain("物理 力学");
   });
 
   test("exerciseがnullの場合はスキップ", () => {
     const exercises = [
       {
         courseTitle: "サンプル講座",
-        courseYear: 2025,
-        courseTerm: "前期",
         chapterTitle: "第1章",
         exerciseTitle: "問題1",
         exerciseId: "001",
@@ -99,8 +91,6 @@ describe("convertToAnkiFormat", () => {
       },
       {
         courseTitle: "サンプル講座",
-        courseYear: 2025,
-        courseTerm: "前期",
         chapterTitle: "第2章",
         exerciseTitle: "問題2",
         exerciseId: "002",
@@ -125,8 +115,6 @@ describe("convertToAnkiFormat", () => {
     const exercises = [
       {
         courseTitle: "プログラミング",
-        courseYear: 2025,
-        courseTerm: "前期",
         chapterTitle: "HTML基礎",
         exerciseTitle: "問題1",
         exerciseId: "001",
@@ -165,8 +153,6 @@ describe("convertToAnkiFormat", () => {
     const exercises = [
       {
         courseTitle: "サンプル講座",
-        courseYear: 2025,
-        courseTerm: "前期",
         chapterTitle: "第1章",
         exerciseTitle: "問題1",
         exerciseId: "001",
@@ -184,7 +170,7 @@ describe("convertToAnkiFormat", () => {
     expect(result).toBe(
       "ウェブブラウザで動作するプログラミング言語は？<br><br>（自由入力）\t" +
         "JavaScript\t" +
-        "サンプル講座 2025年前期 第1章",
+        "サンプル講座 第1章",
     );
   });
 
@@ -192,8 +178,6 @@ describe("convertToAnkiFormat", () => {
     const exercises = [
       {
         courseTitle: "総合講座",
-        courseYear: 2025,
-        courseTerm: "後期",
         chapterTitle: "基礎編",
         exerciseTitle: "問題1",
         exerciseId: "001",
@@ -207,8 +191,6 @@ describe("convertToAnkiFormat", () => {
       },
       {
         courseTitle: "総合講座",
-        courseYear: 2025,
-        courseTerm: "後期",
         chapterTitle: "基礎編",
         exerciseTitle: "問題2",
         exerciseId: "002",
@@ -239,8 +221,6 @@ describe("convertToAnkiFormat", () => {
     const exercises = [
       {
         courseTitle: "プログラミング",
-        courseYear: 2025,
-        courseTerm: "前期",
         chapterTitle: "基礎",
         exerciseTitle: "問題1",
         exerciseId: "001",

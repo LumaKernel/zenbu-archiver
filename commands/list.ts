@@ -58,7 +58,7 @@ export const listCommand = (
         if (completed.length > 0) {
           for (const course of completed) {
             yield* Console.log(
-              `${course.year}年${course.term}:${course.title} (レポート進捗: ${course.reportSubmittedCount}/${course.reportCount})`,
+              `${course.title} (レポート進捗: ${course.reportSubmittedCount}/${course.reportCount})`,
             );
           }
         }
@@ -66,7 +66,7 @@ export const listCommand = (
           yield* Console.log("[進行中(ダウンロード不可)]");
           for (const course of ongoing) {
             yield* Console.log(
-              `${course.year}年${course.term}:${course.title} (レポート進捗: ${course.reportSubmittedCount}/${course.reportCount})`,
+              `${course.title} (レポート進捗: ${course.reportSubmittedCount}/${course.reportCount})`,
             );
           }
         }

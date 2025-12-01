@@ -21,8 +21,6 @@ const ExerciseSchema = Schema.Union(ChoiceExerciseSchema, WordExerciseSchema);
 // エクササイズデータのスキーマ
 export const ExerciseData = Schema.Struct({
   courseTitle: Schema.String,
-  courseYear: Schema.Number,
-  courseTerm: Schema.String,
   chapterTitle: Schema.String,
   exerciseTitle: Schema.String,
   exerciseId: Schema.String,
@@ -84,7 +82,7 @@ export const convertToAnkiFormat = (
     }
 
     // タグ（コース情報）
-    const tagField = `${exerciseData.courseTitle} ${exerciseData.courseYear}年${exerciseData.courseTerm} ${exerciseData.chapterTitle}`;
+    const tagField = `${exerciseData.courseTitle} ${exerciseData.chapterTitle}`;
 
     // タブ区切りで結合
     lines.push(`${questionField}\t${answerField}\t${tagField}`);

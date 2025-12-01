@@ -5,8 +5,6 @@ import { Origin } from "./origin.js";
 
 export class Course extends Schema.Class<Course>("Course")({
   title: Schema.NonEmptyTrimmedString,
-  year: Schema.Positive,
-  term: Schema.NonEmptyTrimmedString,
   courseId: Schema.String,
   reportCount: Schema.NonNegative,
   reportSubmittedCount: Schema.NonNegative,
@@ -22,11 +20,13 @@ export class Course extends Schema.Class<Course>("Course")({
 const parseLocator = async (locator: Locator): Promise<Course | null> => {
   const label = await locator.getAttribute("aria-label");
   if (label == null) return null;
-  const pat = /^(.*):(\d+)年度(前期|後期)$/;
-  const match = label.match(pat);
-  if (match == null) return null;
-  const [, title, year, term] = match;
-  if (!title || !year || !term) return null;
+
+  // 最初の ":" より前がタイトル
+  const colonIndex = label.indexOf(":");
+  if (colonIndex === -1) return null;
+  const title = label.slice(0, colonIndex).trim();
+  if (!title) return null;
+
   const href = await locator.getAttribute("href");
   if (href == null) return null;
   const courseId = href.split("/").pop() || null;
@@ -48,9 +48,7 @@ const parseLocator = async (locator: Locator): Promise<Course | null> => {
   }
 
   return new Course({
-    title: title.trim(),
-    year: parseInt(year, 10),
-    term: term.trim(),
+    title,
     reportCount,
     reportSubmittedCount,
     courseId,

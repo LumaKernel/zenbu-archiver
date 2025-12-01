@@ -78,17 +78,12 @@ export const archiveCommand = (
     if (Option.isSome(only)) {
       const onlyList = only.value.split(",").map((s) => s.trim());
       courses = courses.filter((c) =>
-        onlyList.some((name) =>
-          `${c.year}年${c.term}:${c.title}`.includes(name),
-        ),
+        onlyList.some((name) => c.title.includes(name)),
       );
     } else if (Option.isSome(exclude)) {
       const excludeList = exclude.value.split(",").map((s) => s.trim());
       courses = courses.filter(
-        (c) =>
-          !excludeList.some((name) =>
-            `${c.year}年${c.term}:${c.title}`.includes(name),
-          ),
+        (c) => !excludeList.some((name) => c.title.includes(name)),
       );
     }
 
@@ -107,10 +102,9 @@ export const archiveCommand = (
 
     // 各コースをアーカイブ
     for (const course of courses) {
-      const courseName = `${course.year}年${course.term}_${course.title}`;
       const courseDir = path.join(outputDir, replaceSpecials(course.title));
 
-      yield* Console.log(`\nアーカイブ中: ${courseName}`);
+      yield* Console.log(`\nアーカイブ中: ${course.title}`);
       yield* Effect.tryPromise(() => fs.mkdir(courseDir, { recursive: true }));
 
       // チャプター一覧を取得
@@ -174,8 +168,6 @@ export const archiveCommand = (
             for (const exercise of exercises) {
               allExercisesData.push({
                 courseTitle: course.title,
-                courseYear: course.year,
-                courseTerm: course.term,
                 chapterTitle: chapter.title,
                 exerciseTitle: exercise.title,
                 exerciseId: exercise.exerciseId,
