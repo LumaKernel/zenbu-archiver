@@ -178,4 +178,96 @@ describe("parseExerciseHTML", () => {
     const result = parseExerciseHTML(html);
     expect(result).toBeNull();
   });
+
+  test("自由入力問題（wordタイプ）の解析", () => {
+    const html = `<!DOCTYPE HTML><html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サンプル問題</title>
+  </head>
+  <body>
+    <div id="kokuban-input-target">
+      <h1>問題</h1>
+      <section class="exercise">
+        <div class="statement">
+          <p>（　　）に当てはまる語句を記述してください。<br>
+          プログラミング言語の一つで、ウェブブラウザで動作する言語は（　　）です。</p>
+          <br>
+        </div>
+        <div class="explanation"></div>
+        <ul>
+          <li data-type="word" data-item-id="sample-word-001">
+            <div class="question"></div>
+            <input class="answers" type="text" minlength="1" maxlength="1000" placeholder="入力してください" data-correct-answers="JavaScript">
+            <div class="explanation">
+              <p>解説テキスト</p>
+              <br>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>`;
+
+    const result = parseExerciseHTML(html);
+
+    expect(result).toEqual({
+      type: "word",
+      question:
+        "（　　）に当てはまる語句を記述してください。\n          プログラミング言語の一つで、ウェブブラウザで動作する言語は（　　）です。",
+      correctAnswer: "JavaScript",
+    });
+  });
+
+  test("自由入力問題（wordタイプ）の解析（シンプルな形式）", () => {
+    const html = `<!DOCTYPE HTML><html lang="ja">
+  <body>
+    <div id="kokuban-input-target">
+      <section class="exercise">
+        <div class="statement">
+          <p>日本の首都は？</p>
+        </div>
+        <ul>
+          <li data-type="word" data-item-id="test-001">
+            <div class="question"></div>
+            <input class="answers" type="text" data-correct-answers="東京">
+          </li>
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>`;
+
+    const result = parseExerciseHTML(html);
+
+    expect(result).toEqual({
+      type: "word",
+      question: "日本の首都は？",
+      correctAnswer: "東京",
+    });
+  });
+
+  test("wordタイプで正解が設定されていない場合はnullを返す", () => {
+    const html = `<!DOCTYPE HTML><html lang="ja">
+  <body>
+    <div id="kokuban-input-target">
+      <section class="exercise">
+        <div class="statement">
+          <p>質問文</p>
+        </div>
+        <ul>
+          <li data-type="word" data-item-id="test-002">
+            <input class="answers" type="text">
+          </li>
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>`;
+
+    const result = parseExerciseHTML(html);
+    expect(result).toBeNull();
+  });
 });

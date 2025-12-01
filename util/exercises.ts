@@ -10,6 +10,24 @@ const retrySchedule = Schedule.union(
   Schedule.recurs(6),
 );
 
+// 選択肢問題のスキーマ
+const ChoiceExerciseSchema = Schema.Struct({
+  type: Schema.Literal("choice"),
+  question: Schema.String,
+  choices: Schema.Array(Schema.String),
+  answerIndex: Schema.Number,
+});
+
+// 自由入力問題のスキーマ
+const WordExerciseSchema = Schema.Struct({
+  type: Schema.Literal("word"),
+  question: Schema.String,
+  correctAnswer: Schema.String,
+});
+
+// discriminated union スキーマ
+const ExerciseSchema = Schema.Union(ChoiceExerciseSchema, WordExerciseSchema);
+
 export class ChapterExercise extends Schema.Class<ChapterExercise>(
   "ChapterExercise",
 )({
@@ -17,14 +35,7 @@ export class ChapterExercise extends Schema.Class<ChapterExercise>(
   exerciseId: Schema.String,
   numbering: Schema.NonNegativeInt,
   title: Schema.NonEmptyTrimmedString,
-  exercise: Schema.NullOr(
-    Schema.Struct({
-      type: Schema.Literal("choice"),
-      question: Schema.String,
-      choices: Schema.Array(Schema.String),
-      answerIndex: Schema.Number,
-    }),
-  ),
+  exercise: Schema.NullOr(ExerciseSchema),
   contentAvailable: Schema.Boolean,
 }) {
   declare readonly chapter: CourseChapter;

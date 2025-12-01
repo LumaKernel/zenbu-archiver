@@ -160,4 +160,105 @@ describe("convertToAnkiFormat", () => {
     const result = convertToAnkiFormat([]);
     expect(result).toBe("");
   });
+
+  test("自由入力問題（wordタイプ）を変換", () => {
+    const exercises = [
+      {
+        courseTitle: "サンプル講座",
+        courseYear: 2025,
+        courseTerm: "前期",
+        chapterTitle: "第1章",
+        exerciseTitle: "問題1",
+        exerciseId: "001",
+        contentAvailable: true,
+        exercise: {
+          type: "word" as const,
+          question: "ウェブブラウザで動作するプログラミング言語は？",
+          correctAnswer: "JavaScript",
+        },
+      },
+    ];
+
+    const result = convertToAnkiFormat(exercises);
+
+    expect(result).toBe(
+      "ウェブブラウザで動作するプログラミング言語は？<br><br>（自由入力）\t" +
+        "JavaScript\t" +
+        "サンプル講座 2025年前期 第1章",
+    );
+  });
+
+  test("選択肢問題と自由入力問題を混在させて変換", () => {
+    const exercises = [
+      {
+        courseTitle: "総合講座",
+        courseYear: 2025,
+        courseTerm: "後期",
+        chapterTitle: "基礎編",
+        exerciseTitle: "問題1",
+        exerciseId: "001",
+        contentAvailable: true,
+        exercise: {
+          type: "choice" as const,
+          question: "1+1は？",
+          choices: ["1", "2", "3", "4"],
+          answerIndex: 1,
+        },
+      },
+      {
+        courseTitle: "総合講座",
+        courseYear: 2025,
+        courseTerm: "後期",
+        chapterTitle: "基礎編",
+        exerciseTitle: "問題2",
+        exerciseId: "002",
+        contentAvailable: true,
+        exercise: {
+          type: "word" as const,
+          question: "日本の首都は？",
+          correctAnswer: "東京",
+        },
+      },
+    ];
+
+    const result = convertToAnkiFormat(exercises);
+    const lines = result.split("\n");
+
+    expect(lines).toHaveLength(2);
+    // 選択肢問題
+    expect(lines[0]).toContain("1+1は？");
+    expect(lines[0]).toContain("1. 1<br>");
+    expect(lines[0]).toContain("2. 2");
+    // 自由入力問題
+    expect(lines[1]).toContain("日本の首都は？");
+    expect(lines[1]).toContain("（自由入力）");
+    expect(lines[1]).toContain("\t東京\t");
+  });
+
+  test("自由入力問題で特殊文字をエスケープ", () => {
+    const exercises = [
+      {
+        courseTitle: "プログラミング",
+        courseYear: 2025,
+        courseTerm: "前期",
+        chapterTitle: "基礎",
+        exerciseTitle: "問題1",
+        exerciseId: "001",
+        contentAvailable: true,
+        exercise: {
+          type: "word" as const,
+          question: "タブ\t文字を含む問題",
+          correctAnswer: "タブ\t回答",
+        },
+      },
+    ];
+
+    const result = convertToAnkiFormat(exercises);
+
+    // タブ文字はスペースに変換される
+    expect(result).toContain("タブ    文字を含む問題");
+    expect(result).toContain("タブ    回答");
+    // フィールド区切りのタブは3つ（問題\t答え\tタグ）
+    expect(result.split("\t")).toHaveLength(3);
+  });
 });
