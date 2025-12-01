@@ -10,10 +10,16 @@ const Progress = Schema.Struct({
   status: Schema.Union(Schema.Literal("passed"), Schema.Literal("ready")),
 });
 
+// material_type（main: 本編, appendix: 付録）
+const MaterialType = Schema.Union(
+  Schema.Literal("main"),
+  Schema.Literal("appendix"),
+);
+
 // 動画セクション
 const MovieSection = Schema.Struct({
   resource_type: Schema.Literal("movie"),
-  material_type: Schema.Literal("main"),
+  material_type: MaterialType,
   id: Schema.Number,
   title: Schema.String,
   passed: Schema.Boolean,
@@ -30,7 +36,7 @@ const ExerciseOrReportSection = Schema.Struct({
     Schema.Literal("exercise"),
     Schema.Literal("report"),
   ),
-  material_type: Schema.Literal("main"),
+  material_type: MaterialType,
   id: Schema.Number,
   title: Schema.String,
   passed: Schema.Boolean,
@@ -45,7 +51,7 @@ const ExerciseOrReportSection = Schema.Struct({
 // レッスンセクション（ライブ配信・アーカイブ）
 const LessonSection = Schema.Struct({
   resource_type: Schema.Literal("lesson"),
-  material_type: Schema.Literal("main"),
+  material_type: MaterialType,
   id: Schema.Number,
   title: Schema.String,
   passed: Schema.Boolean,
@@ -61,11 +67,24 @@ const LessonSection = Schema.Struct({
   playback_position: Schema.Number,
 });
 
+// 参考資料セクション
+const ReferenceTextSection = Schema.Struct({
+  resource_type: Schema.Literal("reference_text"),
+  material_type: MaterialType,
+  id: Schema.Number,
+  title: Schema.String,
+  passed: Schema.Boolean,
+  textbook_info: Schema.String,
+  content_available: Schema.Boolean,
+  content_url: Schema.String,
+});
+
 // 全てのセクションタイプのユニオン
 const Section = Schema.Union(
   MovieSection,
   ExerciseOrReportSection,
   LessonSection,
+  ReferenceTextSection,
 );
 
 // チャプター
