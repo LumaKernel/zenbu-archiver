@@ -44,8 +44,9 @@ export const convertToAnkiFormat = (
 ): string => {
   const lines: string[] = [];
 
-  // タブ文字をスペースに置換する関数
-  const escapeTab = (text: string): string => text.replace(/\t/g, "    ");
+  // Anki用にエスケープ（タブ→スペース、改行→<br>）
+  const escapeForAnki = (text: string): string =>
+    text.replace(/\t/g, "    ").replace(/\n/g, "<br>");
 
   for (const exerciseData of exercises) {
     // exerciseがnullの場合はスキップ
@@ -63,22 +64,22 @@ export const convertToAnkiFormat = (
 
       // 問題文と選択肢を組み立て（HTML形式）
       const choicesHtml = choices
-        .map((choice, index) => `${index + 1}. ${escapeTab(choice)}`)
+        .map((choice, index) => `${index + 1}. ${escapeForAnki(choice)}`)
         .join("<br>");
-      questionField = `${escapeTab(question)}<br><br>${choicesHtml}`;
+      questionField = `${escapeForAnki(question)}<br><br>${choicesHtml}`;
 
       // 正解
       const answerText = choices[answerIndex] ?? "";
-      answerField = `${answerIndex + 1}. ${escapeTab(answerText)}`;
+      answerField = `${answerIndex + 1}. ${escapeForAnki(answerText)}`;
     } else {
       // 自由入力問題の処理
       const { question, correctAnswer } = exercise;
 
       // 問題文のみ（自由入力なので選択肢なし）
-      questionField = `${escapeTab(question)}<br><br>（自由入力）`;
+      questionField = `${escapeForAnki(question)}<br><br>（自由入力）`;
 
       // 正解
-      answerField = escapeTab(correctAnswer);
+      answerField = escapeForAnki(correctAnswer);
     }
 
     // タグ（コース情報）

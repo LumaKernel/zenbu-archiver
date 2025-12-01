@@ -140,6 +140,8 @@ describe("convertToAnkiFormat", () => {
     expect(result).toContain("<b>太字</b>");
     // タブ文字はスペースに変換される
     expect(result).toContain("タブ    文字");
+    // 改行文字は<br>に変換される
+    expect(result).toContain("改行<br>含む");
     // フィールド区切りのタブは3つ（問題\t答え\tタグ）
     expect(result.split("\t")).toHaveLength(3);
   });
