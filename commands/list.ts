@@ -17,10 +17,10 @@ export const listCommand = (
     }).pipe(
       Effect.catchAll(() =>
         Effect.gen(function* () {
-          yield* Console.error(
-            "認証情報が見つかりません。先にloginコマンドを実行してください。",
-          );
-          return yield* Effect.fail("認証されていません");
+          const message =
+            "認証情報が見つかりません（.auth/session.json）。先にloginコマンドを実行してください。";
+          yield* Console.error(message);
+          return yield* Effect.fail(message);
         }),
       ),
     );
@@ -28,10 +28,10 @@ export const listCommand = (
     yield* Effect.try(() => validateOrigin(origin)).pipe(
       Effect.catchAll((error) =>
         Effect.gen(function* () {
-          yield* Console.error(
-            "エラー: --originまたはZENBU_ARCHIVE_ORIGIN環境変数が必要です",
-          );
-          return yield* Effect.fail("オリジンが指定されていません");
+          const message =
+            "エラー: --originまたはZENBU_ARCHIVE_ORIGIN環境変数が必要です";
+          yield* Console.error(message);
+          return yield* Effect.fail(message);
         }),
       ),
     );

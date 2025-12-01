@@ -8,6 +8,11 @@ import { Origin } from "../util/origin.js";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
+const retrySchedule = Schedule.union(
+  Schedule.exponential(100),
+  Schedule.recurs(15),
+);
+
 const replaceSpecials = (str: string) =>
   str
     .replace(/\?/g, "？")
@@ -53,10 +58,9 @@ export const archiveCommand = (
       Effect.andThen((stat) => {
         if (stat.isDirectory()) {
           return Effect.gen(function* () {
-            yield* Console.error(
-              `エラー: 出力ディレクトリ '${outputDir}' は既に存在します。`,
-            );
-            return yield* Effect.fail("ディレクトリが既に存在します");
+            const message = `エラー: 出力ディレクトリ '${outputDir}' は既に存在します。`;
+            yield* Console.error(message);
+            return yield* Effect.fail(message);
           });
         }
         return Effect.succeed(undefined);
@@ -70,10 +74,10 @@ export const archiveCommand = (
     }).pipe(
       Effect.catchAll(() =>
         Effect.gen(function* () {
-          yield* Console.error(
-            "認証情報が見つかりません。先にloginコマンドを実行してください。",
-          );
-          return yield* Effect.fail("認証されていません");
+          const message =
+            "認証情報が見つかりません（.auth/session.json）。先にloginコマンドを実行してください。";
+          yield* Console.error(message);
+          return yield* Effect.fail(message);
         }),
       ),
     );
@@ -165,14 +169,7 @@ export const archiveCommand = (
                     await page.pdf({
                       path: pdfPath,
                     });
-                  }).pipe(
-                    Effect.retry(
-                      Schedule.union(
-                        Schedule.exponential(100),
-                        Schedule.recurs(3),
-                      ),
-                    ),
-                  ),
+                  }).pipe(Effect.retry(retrySchedule)),
                 )
                 .pipe(Effect.scoped),
             ),

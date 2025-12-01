@@ -1,9 +1,14 @@
-import { Console, Effect, Schema } from "effect";
+import { Console, Effect, Schedule, Schema } from "effect";
 import { BrowserSession } from "./auth.js";
 import { CourseChapter } from "./chapter.js";
 import { Origin } from "./origin.js";
-import { CourseData } from "./videos.js";
+import { CourseData, type CourseDataType } from "./videos.js";
 import { parseExerciseHTML, type Exercise } from "./exercise-parser.js";
+
+const retrySchedule = Schedule.union(
+  Schedule.exponential(100),
+  Schedule.recurs(6),
+);
 
 export class ChapterExercise extends Schema.Class<ChapterExercise>(
   "ChapterExercise",
@@ -64,7 +69,7 @@ export const getExercises = (chapter: CourseChapter) =>
             },
             [chapter.course.courseId, chapter.chapterId, apiOrigin] as const,
           ),
-        );
+        ).pipe(Effect.retry(retrySchedule));
         const courseData = decode(data);
 
         // エクササイズセクションをフィルタ
@@ -77,6 +82,9 @@ export const getExercises = (chapter: CourseChapter) =>
         // 各エクササイズのHTMLを取得してパース
         const exercisesPromises = exerciseSections.map((section) =>
           Effect.gen(function* () {
+            if (section.resource_type !== "exercise") {
+              throw new Error("Unexpected section type");
+            }
             let exerciseData: Exercise | null = null;
 
             // content_availableをチェック

@@ -7,7 +7,7 @@ import { Origin } from "./origin.js";
 const Progress = Schema.Struct({
   total_count: Schema.Number,
   passed_count: Schema.Number,
-  status: Schema.Literal("passed"),
+  status: Schema.Union(Schema.Literal("passed"), Schema.Literal("ready")),
 });
 
 // 動画セクション
@@ -42,8 +42,31 @@ const ExerciseOrReportSection = Schema.Struct({
   blocked_until: Schema.NullOr(Schema.Any),
 });
 
+// レッスンセクション（ライブ配信・アーカイブ）
+const LessonSection = Schema.Struct({
+  resource_type: Schema.Literal("lesson"),
+  material_type: Schema.Literal("main"),
+  id: Schema.Number,
+  title: Schema.String,
+  passed: Schema.Boolean,
+  textbook_info: Schema.String,
+  content_available: Schema.Boolean,
+  length: Schema.Number,
+  broadcast_status: Schema.Union(
+    Schema.Literal("archive"),
+    // ??
+  ),
+  planned_start_at: Schema.Number,
+  viewer_count: Schema.Number,
+  playback_position: Schema.Number,
+});
+
 // 全てのセクションタイプのユニオン
-const Section = Schema.Union(MovieSection, ExerciseOrReportSection);
+const Section = Schema.Union(
+  MovieSection,
+  ExerciseOrReportSection,
+  LessonSection,
+);
 
 // チャプター
 const Chapter = Schema.Struct({
@@ -58,6 +81,7 @@ const Chapter = Schema.Struct({
 
 // コースデータ全体
 export const CourseData = Schema.Struct({
+  course_type: Schema.Literal("zen_univ"),
   subject_completed: Schema.Boolean,
   chapter: Chapter,
 });
@@ -121,8 +145,9 @@ export const getVideos = (chapter: CourseChapter) =>
         return courseData.chapter.sections
           .map((section) => {
             if (
-              section.resource_type === "movie" &&
-              section.material_type === "main"
+              (section.resource_type === "movie" &&
+                section.material_type === "main") ||
+              section.resource_type === "lesson"
             ) {
               return new ChapterVideo({
                 chapter,

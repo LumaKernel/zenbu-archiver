@@ -10,10 +10,10 @@ export const loginCommand = (
     yield* Effect.try(() => validateOrigin(origin)).pipe(
       Effect.catchAll((error) =>
         Effect.gen(function* () {
-          yield* Console.error(
-            "エラー: --originまたはZENBU_ARCHIVE_ORIGIN環境変数が必要です",
-          );
-          return yield* Effect.fail("オリジンが指定されていません");
+          const message =
+            "エラー: --originまたはZENBU_ARCHIVE_ORIGIN環境変数が必要です";
+          yield* Console.error(message);
+          return yield* Effect.fail(message);
         }),
       ),
     );
