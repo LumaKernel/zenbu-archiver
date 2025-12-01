@@ -26,5 +26,9 @@
     "playwright": "^1.52.0"
   },
   "author": "Luma <world@luma.email>",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.14.0",
+    "bun": ">=1.2.18"
+  }
 }
