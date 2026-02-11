@@ -24,7 +24,7 @@
     "@effect/platform-node": "^0.104.1",
     "@types/cheerio": "^1.0.0",
     "cheerio": "^1.1.2",
-    "effect": "^3.16.5",
+    "effect": "^3.19.16",
     "playwright": "^1.52.0"
   },
   "author": "Luma <world@luma.email>",
