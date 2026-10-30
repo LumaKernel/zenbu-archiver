@@ -50,6 +50,7 @@ describe("parseExerciseHTML", () => {
       question: "次のうち、正しいものはどれか",
       choices: ["選択肢A", "選択肢B", "選択肢C", "選択肢D"],
       answerIndex: 0,
+      explanation: null,
     });
   });
 
@@ -100,6 +101,7 @@ describe("parseExerciseHTML", () => {
       question: "\\(f(x)=x^2\\)の導関数は？",
       choices: ["\\(x\\)", "\\(2x\\)", "\\(x^2\\)", "\\(2x^2\\)"],
       answerIndex: 1,
+      explanation: null,
     });
   });
 
@@ -146,6 +148,7 @@ describe("parseExerciseHTML", () => {
       question: "問題1",
       choices: ["答え1", "答え2"],
       answerIndex: 0,
+      explanation: null,
     });
   });
 
@@ -218,6 +221,7 @@ describe("parseExerciseHTML", () => {
       question:
         "（　　）に当てはまる語句を記述してください。\n          プログラミング言語の一つで、ウェブブラウザで動作する言語は（　　）です。",
       correctAnswer: "JavaScript",
+      explanation: "解説テキスト",
     });
   });
 
@@ -246,6 +250,82 @@ describe("parseExerciseHTML", () => {
       type: "word",
       question: "日本の首都は？",
       correctAnswer: "東京",
+      explanation: null,
+    });
+  });
+
+  test("選択肢問題で解説を抽出（.explanation.section-item）", () => {
+    const html = `<!DOCTYPE HTML><html lang="ja">
+  <body>
+    <div id="kokuban-input-target">
+      <section class="exercise">
+        <div class="statement section-item">
+          <p>正しいものはどれか</p>
+        </div>
+        <ul class="section-item question-list">
+          <li class="exercise-item" data-type="normal">
+            <div class="question">【選択肢】</div>
+            <ul class="answers" data-type="perfect">
+              <li data-correct="true"><p>答えA</p></li>
+              <li data-correct="false"><p>答えB</p></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="explanation section-item">
+          <p>解答：</p>
+          <p>答えAが正解である。理由は以下の通り。</p>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>`;
+
+    const result = parseExerciseHTML(html);
+
+    expect(result).toEqual({
+      type: "choice",
+      question: "正しいものはどれか",
+      choices: ["答えA", "答えB"],
+      answerIndex: 0,
+      explanation: "解答：\n          答えAが正解である。理由は以下の通り。",
+    });
+  });
+
+  test("空のexplanation divがある場合、テキスト有りのexplanationを取得", () => {
+    const html = `<!DOCTYPE HTML><html lang="ja">
+  <body>
+    <section class="exercise">
+      <div class="statement">
+        <p>A∩Bを求めよ</p>
+      </div>
+      <div class="explanation">
+
+      </div>
+      <ul>
+        <li data-type="normal" data-item-id="id-001">
+          <div class="question">【選択肢】</div>
+          <ul class="answers" data-type="perfect">
+            <li data-correct="true"><p>{2,3}</p></li>
+            <li data-correct="false"><p>{1,4}</p></li>
+          </ul>
+          <div class="explanation">
+            <p>解答：</p>
+            <p>A∩Bは共通部分であり{2,3}である。</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </body>
+</html>`;
+
+    const result = parseExerciseHTML(html);
+
+    expect(result).toEqual({
+      type: "choice",
+      question: "A∩Bを求めよ",
+      choices: ["{2,3}", "{1,4}"],
+      answerIndex: 0,
+      explanation: "解答：\n            A∩Bは共通部分であり{2,3}である。",
     });
   });
 

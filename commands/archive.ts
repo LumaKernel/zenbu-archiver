@@ -171,6 +171,8 @@ export const archiveCommand = (
                 chapterTitle: chapter.title,
                 exerciseTitle: exercise.title,
                 exerciseId: exercise.exerciseId,
+                courseId: course.courseId,
+                chapterId: chapter.chapterId,
                 contentAvailable: exercise.contentAvailable,
                 exercise: exercise.exercise,
               });

@@ -6,6 +6,7 @@ export type ChoiceExercise = {
   readonly question: string;
   readonly choices: readonly string[];
   readonly answerIndex: number;
+  readonly explanation: string | null;
 };
 
 // 自由入力問題
@@ -13,6 +14,7 @@ export type WordExercise = {
   readonly type: "word";
   readonly question: string;
   readonly correctAnswer: string;
+  readonly explanation: string | null;
 };
 
 // discriminated union
@@ -37,6 +39,16 @@ export const parseExerciseHTML = (html: string): Exercise | null => {
   }
   const question = statementP.text().trim();
 
+  // 解説テキストを抽出（.explanation から最初にテキストが含まれるものを探す）
+  let explanation: string | null = null;
+  exerciseSection.find(".explanation").each((_index, element) => {
+    if (explanation !== null) return;
+    const text = $(element).text().trim();
+    if (text !== "") {
+      explanation = text;
+    }
+  });
+
   // wordタイプをチェック（data-type="word"を持つli要素）
   const wordLi = exerciseSection.find('li[data-type="word"]').first();
   if (wordLi.length > 0) {
@@ -55,6 +67,7 @@ export const parseExerciseHTML = (html: string): Exercise | null => {
       type: "word",
       question,
       correctAnswer,
+      explanation,
     };
   }
 
@@ -86,5 +99,6 @@ export const parseExerciseHTML = (html: string): Exercise | null => {
     question,
     choices,
     answerIndex,
+    explanation,
   };
 };

@@ -16,6 +16,7 @@ const ChoiceExerciseSchema = Schema.Struct({
   question: Schema.String,
   choices: Schema.Array(Schema.String),
   answerIndex: Schema.Number,
+  explanation: Schema.NullOr(Schema.String),
 });
 
 // 自由入力問題のスキーマ
@@ -23,6 +24,7 @@ const WordExerciseSchema = Schema.Struct({
   type: Schema.Literal("word"),
   question: Schema.String,
   correctAnswer: Schema.String,
+  explanation: Schema.NullOr(Schema.String),
 });
 
 // discriminated union スキーマ

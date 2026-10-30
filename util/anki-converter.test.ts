@@ -15,6 +15,7 @@ describe("convertToAnkiFormat", () => {
           question: "次のうち正しいものはどれか",
           choices: ["選択肢A", "選択肢B", "選択肢C", "選択肢D"],
           answerIndex: 1,
+          explanation: null,
         },
       },
     ];
@@ -45,6 +46,7 @@ describe("convertToAnkiFormat", () => {
           question: "f(x)=x^2の導関数は？",
           choices: ["x", "2x", "x^2", "2x^2"],
           answerIndex: 1,
+          explanation: null,
         },
       },
       {
@@ -63,6 +65,7 @@ describe("convertToAnkiFormat", () => {
             "力=質量-加速度",
           ],
           answerIndex: 0,
+          explanation: null,
         },
       },
     ];
@@ -100,6 +103,7 @@ describe("convertToAnkiFormat", () => {
           question: "正しいものは？",
           choices: ["A", "B"],
           answerIndex: 0,
+          explanation: null,
         },
       },
     ];
@@ -129,6 +133,7 @@ describe("convertToAnkiFormat", () => {
             "改行\n含む",
           ],
           answerIndex: 0,
+          explanation: null,
         },
       },
     ];
@@ -163,6 +168,7 @@ describe("convertToAnkiFormat", () => {
           type: "word" as const,
           question: "ウェブブラウザで動作するプログラミング言語は？",
           correctAnswer: "JavaScript",
+          explanation: null,
         },
       },
     ];
@@ -189,6 +195,7 @@ describe("convertToAnkiFormat", () => {
           question: "1+1は？",
           choices: ["1", "2", "3", "4"],
           answerIndex: 1,
+          explanation: null,
         },
       },
       {
@@ -201,6 +208,7 @@ describe("convertToAnkiFormat", () => {
           type: "word" as const,
           question: "日本の首都は？",
           correctAnswer: "東京",
+          explanation: null,
         },
       },
     ];
@@ -219,6 +227,88 @@ describe("convertToAnkiFormat", () => {
     expect(lines[1]).toContain("\t東京\t");
   });
 
+  test("courseId/chapterIdがある場合、問題文にURLを含める", () => {
+    const exercises = [
+      {
+        courseTitle: "数学",
+        chapterTitle: "第1章",
+        exerciseTitle: "問題1",
+        exerciseId: "001",
+        courseId: "123456",
+        chapterId: "789012",
+        contentAvailable: true,
+        exercise: {
+          type: "choice" as const,
+          question: "1+1は？",
+          choices: ["1", "2", "3"],
+          answerIndex: 1,
+          explanation: null,
+        },
+      },
+    ];
+
+    const result = convertToAnkiFormat(exercises);
+
+    expect(result).toContain("/courses/123456/chapters/789012");
+    expect(result).toContain("<small>");
+  });
+
+  test("解説がある場合、回答フィールドに解説を含める", () => {
+    const exercises = [
+      {
+        courseTitle: "数学",
+        chapterTitle: "第1章",
+        exerciseTitle: "問題1",
+        exerciseId: "001",
+        contentAvailable: true,
+        exercise: {
+          type: "choice" as const,
+          question: "1+1は？",
+          choices: ["1", "2", "3"],
+          answerIndex: 1,
+          explanation: "1+1=2は自明である。",
+        },
+      },
+    ];
+
+    const result = convertToAnkiFormat(exercises);
+    const parts = result.split("\t");
+
+    // 回答フィールドに解説が含まれる
+    expect(parts[1]).toContain("2. 2");
+    expect(parts[1]).toContain("<hr>");
+    expect(parts[1]).toContain("1+1=2は自明である。");
+  });
+
+  test("courseId/chapterIdと解説の両方がある場合の完全な出力", () => {
+    const exercises = [
+      {
+        courseTitle: "物理",
+        chapterTitle: "力学",
+        exerciseTitle: "問題1",
+        exerciseId: "001",
+        courseId: "111",
+        chapterId: "222",
+        contentAvailable: true,
+        exercise: {
+          type: "word" as const,
+          question: "重力加速度は？",
+          correctAnswer: "9.8",
+          explanation: "地球上での重力加速度は約9.8 m/s^2である。",
+        },
+      },
+    ];
+
+    const result = convertToAnkiFormat(exercises);
+    const parts = result.split("\t");
+
+    // 問題フィールドにURLが含まれる
+    expect(parts[0]).toContain("/courses/111/chapters/222");
+    // 回答フィールドに正解と解説が含まれる
+    expect(parts[1]).toContain("9.8");
+    expect(parts[1]).toContain("地球上での重力加速度は約9.8 m/s^2である。");
+  });
+
   test("自由入力問題で特殊文字をエスケープ", () => {
     const exercises = [
       {
@@ -231,6 +321,7 @@ describe("convertToAnkiFormat", () => {
           type: "word" as const,
           question: "タブ\t文字を含む問題",
           correctAnswer: "タブ\t回答",
+          explanation: null,
         },
       },
     ];
