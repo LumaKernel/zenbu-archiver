@@ -33,7 +33,7 @@ export const archiveCommand = (
         webOrigin.replace(/^(https?:\/\/)(?:www\.)?/, "$1api."),
     });
     yield* Console.log(
-      "ノート: すべてのレポートが完了している授業のみが対象になります。",
+      "ノート: 進行中の授業も対象になる。未回答のエクササイズはサイト側でcontent_available=falseとなり、内容を取得できない（警告を出してスキップ）。",
     );
 
     // 出力ディレクトリの存在確認
@@ -71,8 +71,8 @@ export const archiveCommand = (
       Effect.provide(makeBrowserSessionLive(!debugHeaded)),
     );
 
-    // 完了している授業のみフィルタ
-    let courses = allCourses.filter((c) => c.reportFullFinished);
+    // レポート進捗に関係なく全授業を対象にする（サイト側は未完了でも教材を閲覧可能）
+    let courses = allCourses;
 
     // --only または --exclude でフィルタリング
     if (Option.isSome(only)) {

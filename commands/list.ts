@@ -54,7 +54,7 @@ export const listCommand = (
       if (courses.length > 0) {
         const completed = courses.filter((course) => course.reportFullFinished);
         const ongoing = courses.filter((course) => !course.reportFullFinished);
-        yield* Console.log("[完了(ダウンロード可)]");
+        yield* Console.log("[完了]");
         if (completed.length > 0) {
           for (const course of completed) {
             yield* Console.log(
@@ -63,7 +63,7 @@ export const listCommand = (
           }
         }
         if (ongoing.length > 0) {
-          yield* Console.log("[進行中(ダウンロード不可)]");
+          yield* Console.log("[進行中]");
           for (const course of ongoing) {
             yield* Console.log(
               `${course.title} (レポート進捗: ${course.reportSubmittedCount}/${course.reportCount})`,

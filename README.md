@@ -63,7 +63,7 @@ export ZENBU_ARCHIVE_ORIGIN=https://www.example.com
 
 ### 5. アーカイブの実行
 
-すべての完了済み授業をアーカイブ：
+すべての授業をアーカイブ（レポート進捗に関係なく対象になる）：
 
 ```bash
 ./bin/cli.ts archive --output-dir archives/
@@ -120,7 +120,7 @@ archives/
 
 ### 使用上の注意
 
-- 完了していないコンテンツはアーカイブ対象になりません
+- 進行中の授業もアーカイブ対象になる。ただし未回答のエクササイズは内容を取得できない（警告を出してスキップし、exercises.jsonでは contentAvailable: false になる）
 - アーカイブ処理には時間がかかる場合があります
 - 既に存在する出力ディレクトリを指定するとエラーになります
 
